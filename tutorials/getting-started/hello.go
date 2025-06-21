@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"rsc.io/quote"
-	"go-playground/greetings"
-)
 
+	"rsc.io/quote"
+)
 
 func main() {
 	fmt.Println(quote.Go())
-	message := greetings.Hello("Gladys")
-	fmt.Println(message)
 }
