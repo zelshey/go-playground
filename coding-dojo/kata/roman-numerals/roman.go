@@ -1,12 +1,14 @@
 package roman
 
-import "log"
+import "strings"
 
-func ArabicToRoman(digit int) string {
-	characters := []struct {
-		Arabic int
-		Roman  string
-	}{
+type RomanNumeral struct {
+	Arabic int
+	Roman  string
+}
+
+func getCharacters() []RomanNumeral {
+	return []RomanNumeral{
 		{Arabic: 1000, Roman: "M"},
 		{Arabic: 500, Roman: "D"},
 		{Arabic: 100, Roman: "C"},
@@ -15,24 +17,47 @@ func ArabicToRoman(digit int) string {
 		{Arabic: 5, Roman: "V"},
 		{Arabic: 1, Roman: "I"},
 	}
+}
 
+func ArabicToRoman(digit int) string {
+	characters := getCharacters()
 	ret := ""
 
-	for {
-		if digit < 0 {
-			log.Fatal("Invalid value during calculation")
+	for i, c := range characters {
+		for digit >= c.Arabic {
+			ret += c.Roman
+			digit -= c.Arabic
 		}
 
-		if digit == 0 {
-			break
-		}
-
-		for _, c := range characters {
-			if digit >= c.Arabic {
-				ret += c.Roman
-				digit -= c.Arabic
-				break
+		for _, n := range characters[i+1:] {
+			value := c.Arabic - n.Arabic
+			for digit >= value && value != n.Arabic {
+				ret += n.Roman + c.Roman
+				digit -= value
 			}
+		}
+
+	}
+
+	return ret
+}
+
+func RomanToArabic(roman string) int {
+	ret := 0
+	characters := getCharacters()
+
+	for i, c := range characters {
+		for _, p := range characters[:i] {
+			pre := c.Roman + p.Roman
+			for strings.HasPrefix(roman, pre) {
+				roman = strings.TrimPrefix(roman, pre)
+				ret += p.Arabic - c.Arabic
+			}
+		}
+
+		for strings.HasPrefix(roman, c.Roman) {
+			roman = strings.TrimPrefix(roman, c.Roman)
+			ret += c.Arabic
 		}
 	}
 
